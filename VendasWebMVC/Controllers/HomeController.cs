@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VendasWebMVC.Models;
 
+
 namespace VendasWebMVC.Controllers
 {
     public class HomeController : Controller
