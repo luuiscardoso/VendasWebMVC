@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using VendasWebMVC.Models;
 
 namespace VendasWebMVC.Data
 {
@@ -8,7 +9,11 @@ namespace VendasWebMVC.Data
         {
         }
 
-        public DbSet<VendasWebMVC.Models.mdlDepartment> Department { get; set; }
+        public DbSet<Department> Department { get; set; }
+
+        public DbSet<Seller> Seller { get; set; }
+
+        public DbSet<SalesRecord> SalesRecord { get; set; }
     }
 }
 

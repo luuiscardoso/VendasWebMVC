@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VendasWebMVC.Data;
 
 namespace VendasWebMVC.Migrations
 {
     [DbContext(typeof(BdContext))]
-    partial class BdContextModelSnapshot : ModelSnapshot
+    [Migration("20240724234102_OtheEntities")]
+    partial class OtheEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
