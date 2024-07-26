@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using VendasWebMVC.Data;
 using VendasWebMVC.Models;
+using VendasWebMVC.Services;
 
 namespace VendasWebMVC.Controllers
 {
     public class DepartmentsController : Controller
     {
         private readonly BdContext _bdContext;
+        private readonly SellerService _sellerService;
 
         public DepartmentsController(BdContext context)
         {
