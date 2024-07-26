@@ -18,5 +18,12 @@ namespace VendasWebMVC.Services
         {
             return _bdContext.Seller.ToList();
         }
+
+        public void Insert(Seller seller)
+        {
+            _bdContext.Add(seller);
+            _bdContext.SaveChanges();
+        }
+
     }
 }
