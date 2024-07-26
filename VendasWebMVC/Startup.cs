@@ -37,6 +37,7 @@ namespace VendasWebMVC
                     options.UseSqlServer(Configuration.GetConnectionString("DataBase"), builder =>
                         builder.MigrationsAssembly("VendasWebMVC")));
 
+            services.AddScoped<SeedingService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -44,11 +45,12 @@ namespace VendasWebMVC
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, SeedingService seedingService)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                seedingService.Seed();
             }
             else
             {
