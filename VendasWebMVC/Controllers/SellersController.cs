@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using VendasWebMVC.Models;
 using VendasWebMVC.Models.ViewModels;
@@ -24,7 +25,7 @@ namespace VendasWebMVC.Controllers
         public IActionResult Create()
         {
             List<Department> departmets = _departmentService.FindAll();
-            SellerFormViewModel viewModel = new SellerFormViewModel { Departments = departmets };   
+            SellerFormViewModel viewModel = new SellerFormViewModel { Departments = departmets };
             return View(viewModel);
         }
 
@@ -32,8 +33,26 @@ namespace VendasWebMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Seller seller)
         {
-            _sellerService.Insert(seller); 
+            _sellerService.Insert(seller);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            try
+            {
+                if (id == null) return NotFound();
+
+                Seller seller = _sellerService.FindById(id.Value);
+
+                return View(seller);
+            }
+            catch(KeyNotFoundException e)
+            {
+                return NotFound(new { message = e.Message});
+            }
+            
+
         }
     }
 }
