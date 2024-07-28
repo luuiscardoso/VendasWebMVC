@@ -21,7 +21,7 @@ namespace VendasWebMVC.Services
 
         public Seller FindById(int id)
         {
-            var seller = _bdContext.Seller.FirstOrDefault(s => s.Id == id);
+            Seller seller = _bdContext.Seller.FirstOrDefault(s => s.Id == id);
             if (seller == null)
             {
                 throw new KeyNotFoundException($"Seller with Id {id} not found.");
@@ -37,7 +37,7 @@ namespace VendasWebMVC.Services
 
         public void Remove(int id)
         {
-            var seller = _bdContext.Seller.Find(id);
+            Seller seller = _bdContext.Seller.Find(id);
             if (seller == null)
             {
                 throw new KeyNotFoundException($"Seller with Id {id} not found.");

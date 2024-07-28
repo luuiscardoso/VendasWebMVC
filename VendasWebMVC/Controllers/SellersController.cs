@@ -37,7 +37,7 @@ namespace VendasWebMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int? id)
+        public IActionResult DeleteConfirmation(int? id)
         {
             try
             {
@@ -47,12 +47,26 @@ namespace VendasWebMVC.Controllers
 
                 return View(seller);
             }
-            catch(KeyNotFoundException e)
+            catch (KeyNotFoundException e)
             {
-                return NotFound(new { message = e.Message});
+                return NotFound(new { message = e.Message });
             }
-            
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            try
+            {
+                _sellerService.Remove(id);
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                return NotFound(new { message = e.Message });
+            }
         }
     }
 }
