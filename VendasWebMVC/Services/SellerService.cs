@@ -3,6 +3,8 @@ using System.Linq;
 using VendasWebMVC.Data;
 using VendasWebMVC.Models;
 using Microsoft.EntityFrameworkCore;
+using VendasWebMVC.Services.Exceptions;
+using System;
 
 namespace VendasWebMVC.Services
 {
@@ -47,5 +49,24 @@ namespace VendasWebMVC.Services
             _bdContext.SaveChanges();
         }
 
+        public void Update(Seller seller)
+        {
+            // if a seller don't exists in database we throw a excpetion
+            if (!_bdContext.Seller.Any(s => s.Id == seller.Id))
+            {
+                throw new NotFoundException("Seller not found");
+            }
+
+            try
+            {
+                _bdContext.Update(seller);
+                _bdContext.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException e)
+            {
+                throw new DbConcurrencyExcpeption(e.Message);
+            }
+            
+        }
     }
 }
