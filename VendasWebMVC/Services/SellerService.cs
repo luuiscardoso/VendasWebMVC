@@ -2,6 +2,7 @@
 using System.Linq;
 using VendasWebMVC.Data;
 using VendasWebMVC.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace VendasWebMVC.Services
 {
@@ -21,7 +22,7 @@ namespace VendasWebMVC.Services
 
         public Seller FindById(int id)
         {
-            Seller seller = _bdContext.Seller.FirstOrDefault(s => s.Id == id);
+            Seller seller = _bdContext.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
             if (seller == null)
             {
                 throw new KeyNotFoundException($"Seller with Id {id} not found.");

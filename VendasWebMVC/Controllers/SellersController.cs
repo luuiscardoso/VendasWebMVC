@@ -68,5 +68,21 @@ namespace VendasWebMVC.Controllers
                 return NotFound(new { message = e.Message });
             }
         }
+
+        public IActionResult Details (int? id)
+        {
+            try
+            {
+                if (id == null) return NotFound();
+
+                Seller seller = _sellerService.FindById(id.Value);
+
+                return View(seller);
+            }
+            catch (KeyNotFoundException e)
+            {
+                return NotFound(new { message = e.Message });
+            }
+        }
     }
 }
