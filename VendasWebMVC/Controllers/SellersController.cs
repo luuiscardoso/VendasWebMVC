@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using VendasWebMVC.Models;
 using VendasWebMVC.Models.ViewModels;
 using VendasWebMVC.Services;
@@ -44,15 +45,15 @@ namespace VendasWebMVC.Controllers
         {
             try
             {
-                if (id == null) return NotFound();
+                if (id == null) return RedirectToAction(nameof(Error), new {message = "Id not provided"});
 
                 Seller seller = _sellerService.FindById(id.Value);
 
                 return View(seller);
             }
-            catch (KeyNotFoundException e)
+            catch (ApplicationException e)
             {
-                return NotFound(new { message = e.Message });
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
         }
 
@@ -68,7 +69,7 @@ namespace VendasWebMVC.Controllers
             }
             catch (Exception e)
             {
-                return NotFound(new { message = e.Message });
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
         }
 
@@ -76,7 +77,7 @@ namespace VendasWebMVC.Controllers
         {
             try
             {
-                if (id == null) return NotFound();
+                if (id == null)  return RedirectToAction(nameof(Error), new { message = "Id not provided" });
 
                 Seller seller = _sellerService.FindById(id.Value);
 
@@ -84,7 +85,7 @@ namespace VendasWebMVC.Controllers
             }
             catch (KeyNotFoundException e)
             {
-                return NotFound(new { message = e.Message });
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
         }
 
@@ -93,7 +94,7 @@ namespace VendasWebMVC.Controllers
         {
             try
             {
-                if (id == null) return NotFound();
+                if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
 
                 List<Department> departments = _departmentService.FindAll();
                 Seller seller = _sellerService.FindById(id.Value);
@@ -103,7 +104,7 @@ namespace VendasWebMVC.Controllers
             }
             catch (KeyNotFoundException e)
             {
-                return NotFound(new { message = e.Message });
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
         }
 
@@ -113,7 +114,7 @@ namespace VendasWebMVC.Controllers
         {
             if (id != seller.Id)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
             }
 
             try
@@ -121,14 +122,16 @@ namespace VendasWebMVC.Controllers
                 _sellerService.Update(seller);
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundException e)
+            catch (ApplicationException e)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
-            catch(DbConcurrencyExcpeption e)
-            {
-                return BadRequest(e.Message);
-            }
+        }
+
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel { Message = message, RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier };
+            return View(viewModel);
         }
     }
 }

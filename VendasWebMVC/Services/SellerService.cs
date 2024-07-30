@@ -27,7 +27,7 @@ namespace VendasWebMVC.Services
             Seller seller = _bdContext.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
             if (seller == null)
             {
-                throw new KeyNotFoundException($"Seller with Id {id} not found.");
+                throw new NotFoundException($"Seller with Id {id} not found.");
             }
             return seller;
         }
@@ -41,10 +41,6 @@ namespace VendasWebMVC.Services
         public void Remove(int id)
         {
             Seller seller = _bdContext.Seller.Find(id);
-            if (seller == null)
-            {
-                throw new KeyNotFoundException($"Seller with Id {id} not found.");
-            }
             _bdContext.Seller.Remove(seller);
             _bdContext.SaveChanges();
         }
