@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using VendasWebMVC.Models;
 using VendasWebMVC.Models.ViewModels;
 using VendasWebMVC.Services;
+using VendasWebMVC.Services.Exceptions;
 
 namespace VendasWebMVC.Controllers
 {
@@ -22,6 +23,7 @@ namespace VendasWebMVC.Controllers
             return View(sellers);
         }
 
+        //GET
         public IActionResult Create()
         {
             List<Department> departmets = _departmentService.FindAll();
@@ -37,6 +39,7 @@ namespace VendasWebMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        //GET 
         public IActionResult DeleteConfirmation(int? id)
         {
             try
@@ -85,18 +88,46 @@ namespace VendasWebMVC.Controllers
             }
         }
 
+        // GET
         public IActionResult Edit(int? id)
         {
             try
             {
                 if (id == null) return NotFound();
 
+                List<Department> departments = _departmentService.FindAll();
                 Seller seller = _sellerService.FindById(id.Value);
-                return View(seller);
+
+                SellerFormViewModel sf = new SellerFormViewModel { Seller = seller, Departments = departments};
+                return View(sf);
             }
             catch (KeyNotFoundException e)
             {
                 return NotFound(new { message = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Seller seller)
+        {
+            if (id != seller.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                _sellerService.Update(seller);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound();
+            }
+            catch(DbConcurrencyExcpeption e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }
