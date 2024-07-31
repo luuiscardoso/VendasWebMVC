@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using VendasWebMVC.Data;
 using VendasWebMVC.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace VendasWebMVC.Services
 {
@@ -14,9 +16,9 @@ namespace VendasWebMVC.Services
             _bdContext = bdContext;
         }
 
-        public List<Department> FindAll() // ver todos
+        public async Task<List<Department>> FindAllAsync() // ver todos
         {
-            return _bdContext.Department.OrderBy(d => d.Name).ToList();
+            return await _bdContext.Department.OrderBy(d => d.Name).ToListAsync();
         }
     }
 }

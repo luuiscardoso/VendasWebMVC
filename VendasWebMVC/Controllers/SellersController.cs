@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using VendasWebMVC.Models;
 using VendasWebMVC.Models.ViewModels;
 using VendasWebMVC.Services;
@@ -18,42 +19,42 @@ namespace VendasWebMVC.Controllers
             _sellerService = sellerService;
             _departmentService = departmentService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<Seller> sellers = _sellerService.FindAll();
+            List<Seller> sellers = await _sellerService.FindAllAsync();
             return View(sellers);
         }
 
         //GET
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            List<Department> departmets = _departmentService.FindAll();
+            List<Department> departmets =  await _departmentService.FindAllAsync();
             SellerFormViewModel viewModel = new SellerFormViewModel { Departments = departmets };
             return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Seller seller)
+        public async Task<IActionResult> Create(Seller seller)
         {
             if (!ModelState.IsValid)
             {
-                var departments = _departmentService.FindAll();
+                var departments = await _departmentService.FindAllAsync();
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(viewModel);
             }
-            _sellerService.Insert(seller);
+            await _sellerService.InsertAsync(seller);
             return RedirectToAction(nameof(Index));
         }
 
         //GET 
-        public IActionResult DeleteConfirmation(int? id)
+        public async Task<IActionResult> DeleteConfirmation(int? id)
         {
             try
             {
                 if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
 
-                Seller seller = _sellerService.FindById(id.Value);
+                Seller seller = await _sellerService.FindByIdAsync(id.Value);
 
                 return View(seller);
             }
@@ -65,19 +66,19 @@ namespace VendasWebMVC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _sellerService.Remove(id);
+            await _sellerService.RemoveAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             try
             {
                 if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
 
-                Seller seller = _sellerService.FindById(id.Value);
+                Seller seller = await _sellerService.FindByIdAsync(id.Value);
 
                 return View(seller);
             }
@@ -88,14 +89,14 @@ namespace VendasWebMVC.Controllers
         }
 
         // GET
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             try
             {
                 if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
 
-                List<Department> departments = _departmentService.FindAll();
-                Seller seller = _sellerService.FindById(id.Value);
+                List<Department> departments = await _departmentService.FindAllAsync();
+                Seller seller = await _sellerService.FindByIdAsync(id.Value);
 
                 SellerFormViewModel sf = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(sf);
@@ -108,11 +109,11 @@ namespace VendasWebMVC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Seller seller)
+        public async Task<IActionResult> Edit(int id, Seller seller)
         {
             if (!ModelState.IsValid)
             {
-                var departments = _departmentService.FindAll();
+                var departments = await _departmentService.FindAllAsync();
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(viewModel);
             }
@@ -124,7 +125,7 @@ namespace VendasWebMVC.Controllers
 
             try
             {
-                _sellerService.Update(seller);
+                await _sellerService.UpdateAsync(seller);
                 return RedirectToAction(nameof(Index));
             }
             catch (ApplicationException e)

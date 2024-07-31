@@ -5,6 +5,7 @@ using VendasWebMVC.Models;
 using Microsoft.EntityFrameworkCore;
 using VendasWebMVC.Services.Exceptions;
 using System;
+using System.Threading.Tasks;
 
 namespace VendasWebMVC.Services
 {
@@ -17,38 +18,39 @@ namespace VendasWebMVC.Services
             _bdContext = bdContext;
         }
 
-        public List<Seller> FindAll() // ver todos
+        public async Task<List<Seller>> FindAllAsync() // ver todos
         {
-            return _bdContext.Seller.ToList();
+            return await _bdContext.Seller.ToListAsync();
         }
 
-        public Seller FindById(int id)
+        public async Task<Seller> FindByIdAsync(int id)
         {
-            Seller seller = _bdContext.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
+            Task<Seller> seller = _bdContext.Seller.Include(s => s.Department).FirstOrDefaultAsync(s => s.Id == id);
             if (seller == null)
             {
                 throw new NotFoundException($"Seller with Id {id} not found.");
             }
-            return seller;
+            return await seller;
         }
 
-        public void Insert(Seller seller)
+        public async Task InsertAsync(Seller seller)
         {
             _bdContext.Add(seller);
-            _bdContext.SaveChanges();
+            await _bdContext.SaveChangesAsync();
         }
 
-        public void Remove(int id)
+        public async Task RemoveAsync(int id)
         {
-            Seller seller = _bdContext.Seller.Find(id);
+            var seller = await _bdContext.Seller.FindAsync(id);
             _bdContext.Seller.Remove(seller);
-            _bdContext.SaveChanges();
+            await _bdContext.SaveChangesAsync();
         }
 
-        public void Update(Seller seller)
+        public async Task UpdateAsync(Seller seller)
         {
+            bool hasAny = await _bdContext.Seller.AnyAsync(s => s.Id == seller.Id);
             // if a seller don't exists in database we throw a excpetion
-            if (!_bdContext.Seller.Any(s => s.Id == seller.Id))
+            if (!hasAny)
             {
                 throw new NotFoundException("Seller not found");
             }
@@ -56,7 +58,7 @@ namespace VendasWebMVC.Services
             try
             {
                 _bdContext.Update(seller);
-                _bdContext.SaveChanges();
+                await _bdContext.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException e)
             {
