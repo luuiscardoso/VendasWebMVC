@@ -45,7 +45,7 @@ namespace VendasWebMVC.Controllers
         {
             try
             {
-                if (id == null) return RedirectToAction(nameof(Error), new {message = "Id not provided"});
+                if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
 
                 Seller seller = _sellerService.FindById(id.Value);
 
@@ -61,23 +61,15 @@ namespace VendasWebMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            try
-            {
-                _sellerService.Remove(id);
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception e)
-            {
-                return RedirectToAction(nameof(Error), new { message = "Id not found" });
-            }
+            _sellerService.Remove(id);
+            return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Details (int? id)
+        public IActionResult Details(int? id)
         {
             try
             {
-                if (id == null)  return RedirectToAction(nameof(Error), new { message = "Id not provided" });
+                if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
 
                 Seller seller = _sellerService.FindById(id.Value);
 
@@ -99,7 +91,7 @@ namespace VendasWebMVC.Controllers
                 List<Department> departments = _departmentService.FindAll();
                 Seller seller = _sellerService.FindById(id.Value);
 
-                SellerFormViewModel sf = new SellerFormViewModel { Seller = seller, Departments = departments};
+                SellerFormViewModel sf = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(sf);
             }
             catch (KeyNotFoundException e)
