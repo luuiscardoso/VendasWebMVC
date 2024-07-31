@@ -25,12 +25,12 @@ namespace VendasWebMVC.Services
 
         public async Task<Seller> FindByIdAsync(int id)
         {
-            Task<Seller> seller = _bdContext.Seller.Include(s => s.Department).FirstOrDefaultAsync(s => s.Id == id);
+            var seller = await _bdContext.Seller.Include(s => s.Department).FirstOrDefaultAsync(s => s.Id == id);
             if (seller == null)
             {
                 throw new NotFoundException($"Seller with Id {id} not found.");
             }
-            return await seller;
+            return  seller;
         }
 
         public async Task InsertAsync(Seller seller)
@@ -41,9 +41,17 @@ namespace VendasWebMVC.Services
 
         public async Task RemoveAsync(int id)
         {
-            var seller = await _bdContext.Seller.FindAsync(id);
-            _bdContext.Seller.Remove(seller);
-            await _bdContext.SaveChangesAsync();
+            try
+            {
+                var seller = await _bdContext.Seller.FindAsync(id);
+                _bdContext.Seller.Remove(seller);
+                await _bdContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                throw new IntegrityException("This seller have sales. Can't delete");
+            }
+            
         }
 
         public async Task UpdateAsync(Seller seller)
