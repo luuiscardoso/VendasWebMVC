@@ -39,7 +39,7 @@ namespace VendasWebMVC.Services
             await _bdContext.SaveChangesAsync();
         }
 
-        public async Task RemoveAsync(int id)
+        public async Task RemoveAsync(int id)  
         {
             try
             {
