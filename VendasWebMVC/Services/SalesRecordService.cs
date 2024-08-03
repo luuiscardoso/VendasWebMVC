@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using VendasWebMVC.Data;
 using VendasWebMVC.Models;
+using VendasWebMVC.Services.Exceptions;
+using VendasWebMVC.Services.Extension;
 
 namespace VendasWebMVC.Services
 {
@@ -19,39 +21,50 @@ namespace VendasWebMVC.Services
 
         public async Task<List<SalesRecord>> FindByDateAsync(DateTime? initial, DateTime? final)
         {
-            var result = from sale in _bdContext.SalesRecord select sale; // selecting all sales in SalesRecord table
-            if (initial.HasValue) // if the var have a value, lets do a new consult
-            {                                 //contain         
-                result.Where(sale => sale.Date >= initial);
-            }
-            if (final.HasValue)
+            if(initial.Value > final.Value)
             {
-                result.Where(sale => sale.Date <= final);
+                throw new DomainException("The start date must be less than the end date.");
             }
-            // in the final result,  we'll have a consult with the initial date e final date filterted
-             return await result.Include(sale => sale.Seller)
-                  .Include(sale => sale.Seller.Department)
-                  .OrderByDescending(sale => sale.Date)
-                  .ToListAsync(); // this command actually executes the query
+
+            var result = _bdContext.SalesRecord.AsQueryable() // create a base query by converting IEnumerable into IQueryable
+                                               .BiggerOrEqual(initial) // sending base query to be manipulated
+                                               .SmallerOrEqual(final)
+                                               .Include(sale => sale.Seller)
+                                               .Include(sale => sale.Seller.Department)
+                                               .OrderByDescending(sale => sale.Date)
+                                               .ToListAsync();
+
+            return await result;
         }
 
-        public async Task< List<IGrouping<Department,SalesRecord> > > FindByDateGroupAsync(DateTime? initial, DateTime? final)
+        public async Task<List<IGrouping<Department,SalesRecord>>> FindByDateGroupAsync(DateTime? initial, DateTime? final)
         {
-            var result = from sale in _bdContext.SalesRecord select sale; 
-            if (initial.HasValue) 
-            {                                        
-                result.Where(sale => sale.Date >= initial);
-            }
-            if (final.HasValue)
+            if (initial.Value > final.Value)
             {
-                result.Where(sale => sale.Date <= final);
+                throw new DomainException("The start date must be less than the end date.");
             }
-            
-            return await result.Include(sale => sale.Seller)
-                 .Include(sale => sale.Seller.Department)
-                 .OrderByDescending(sale => sale.Date)
-                 .GroupBy(sale => sale.Seller.Department)
-                 .ToListAsync(); 
+
+            var query = _bdContext.SalesRecord.AsQueryable()
+                                              .BiggerOrEqual(initial.Value)
+                                              .SmallerOrEqual(final.Value)
+                                              .Include(sale => sale.Seller)
+                                              .Include(sale => sale.Seller.Department)
+                                              .OrderByDescending(sale => sale.Date)
+                                              .GroupBy(sale => sale.Seller.Department)
+                                              .ToListAsync();
+
+            return await query;
         }
     }
 }
+
+            //result = DateQueryExtension.BiggerOrEqual(result, initial.Value);
+            //result = DateQueryExtension.SmallerOrEqual(result, final.Value);
+            //if (initial.HasValue) 
+            //{                                        
+            //    result = result.Where(sale => sale.Date >= initial);
+            //}
+            //if (final.HasValue)
+            //{
+            //    result = result.Where(sale => sale.Date <= final);
+            //}

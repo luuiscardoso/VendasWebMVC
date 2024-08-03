@@ -90,7 +90,7 @@ namespace VendasWebMVC.Controllers
 
                 return View(seller);
             }
-            catch (KeyNotFoundException e)
+            catch (NotFoundException e)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }

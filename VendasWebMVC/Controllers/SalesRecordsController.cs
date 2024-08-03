@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using VendasWebMVC.Migrations;
+using VendasWebMVC.Models;
 using VendasWebMVC.Services;
 
 namespace VendasWebMVC.Controllers
@@ -20,37 +22,61 @@ namespace VendasWebMVC.Controllers
 
         public async Task<IActionResult> SimpleSearch(DateTime? initial, DateTime? final)
         {
-            if (initial.HasValue)
+            try
             {
+                if (!initial.HasValue)
+                {
+                    initial = new DateTime(DateTime.Now.Year, 1, 1);
+                }
+                if (!final.HasValue)
+                {
+                    final = DateTime.Now;
+                }
+
                 ViewData["minDate"] = initial.Value.ToString("yyyy-MM-dd");
-            }
-            if (final.HasValue)
-            {
                 ViewData["maxDate"] = final.Value.ToString("yyyy-MM-dd");
+
+                var salesRecords = await _salerRecordService.FindByDateAsync(initial, final);
+
+                return View(salesRecords);
             }
-           
-            var salesRecords = await _salerRecordService.FindByDateAsync(initial, final);
-            
-            return View(salesRecords);
+            catch (ApplicationException e)
+            {
+                return RedirectToAction(nameof(Error), new { Message = e.Message });
+            }
+
         }
 
         public async Task<IActionResult> GroupingSearch(DateTime? initial, DateTime? final)
         {
-            if (!initial.HasValue)
+            try
             {
-                initial = new DateTime(DateTime.Now.Year, 1, 1);
+                if (!initial.HasValue)
+                {
+                    initial = new DateTime(DateTime.Now.Year, 1, 1);
+                }
+                if (!final.HasValue)
+                {
+                    final = DateTime.Now;
+                }
+
+                ViewData["minDate"] = initial.Value.ToString("yyyy-MM-dd");
+                ViewData["maxDate"] = final.Value.ToString("yyyy-MM-dd");
+
+                var salesRecords = await _salerRecordService.FindByDateGroupAsync(initial, final);
+
+                return View(salesRecords);
             }
-            if (!final.HasValue)
+            catch (ApplicationException e)
             {
-                final = DateTime.Now;
+                return RedirectToAction(nameof(Error), new { Message = e.Message });
             }
+        }
 
-            ViewData["minDate"] = initial.Value.ToString("yyyy-MM-dd");
-            ViewData["maxDate"] = final.Value.ToString("yyyy-MM-dd");
-
-            var salesRecords = await _salerRecordService.FindByDateGroupAsync(initial, final);
-
-            return View(salesRecords);
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel { Message = message, RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier };
+            return View(viewModel);
         }
     }
 }

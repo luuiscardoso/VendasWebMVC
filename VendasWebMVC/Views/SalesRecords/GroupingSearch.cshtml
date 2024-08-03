@@ -27,7 +27,12 @@
 
     </div>
 </nav>
-
+@if (!Model.Any())
+{
+    <p>No records found for the selected period. Adjust dates to view other sales.</p>
+}
+else
+{
 @foreach (var departmentGroup in Model)
 {
     <div class="panel panel-primary">
@@ -76,4 +81,5 @@
             </table>
         </div>
     </div>
+}
 }
