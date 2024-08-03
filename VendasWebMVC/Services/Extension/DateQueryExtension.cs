@@ -8,20 +8,12 @@ namespace VendasWebMVC.Services.Extension
     {
         public static IQueryable<SalesRecord> BiggerOrEqual(this IQueryable<SalesRecord> baseQuery, DateTime? initial)
         {
-            if (initial.HasValue)
-            {
-                return baseQuery.Where(sale => sale.Date >= initial);
-            }
-            return baseQuery;
+            return baseQuery.Where(sale => sale.Date >= initial);
         }
 
         public static IQueryable<SalesRecord> SmallerOrEqual(this IQueryable<SalesRecord> baseQuery, DateTime? final)
         {
-            if (final.HasValue)
-            {
-                return baseQuery.Where(sale => sale.Date <= final);
-            }
-            return baseQuery;
+            return baseQuery.Where(sale => sale.Date <= final);
         }
     }
 }
