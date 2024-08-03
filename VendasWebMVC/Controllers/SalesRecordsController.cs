@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using VendasWebMVC.Migrations;
 using VendasWebMVC.Services;
 
 namespace VendasWebMVC.Controllers
@@ -33,9 +34,23 @@ namespace VendasWebMVC.Controllers
             return View(salesRecords);
         }
 
-        public IActionResult GroupingSearch()
+        public async Task<IActionResult> GroupingSearch(DateTime? initial, DateTime? final)
         {
-            return View();
+            if (!initial.HasValue)
+            {
+                initial = new DateTime(DateTime.Now.Year, 1, 1);
+            }
+            if (!final.HasValue)
+            {
+                final = DateTime.Now;
+            }
+
+            ViewData["minDate"] = initial.Value.ToString("yyyy-MM-dd");
+            ViewData["maxDate"] = final.Value.ToString("yyyy-MM-dd");
+
+            var salesRecords = await _salerRecordService.FindByDateGroupAsync(initial, final);
+
+            return View(salesRecords);
         }
     }
 }

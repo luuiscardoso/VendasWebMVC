@@ -33,10 +33,25 @@ namespace VendasWebMVC.Services
                   .Include(sale => sale.Seller.Department)
                   .OrderByDescending(sale => sale.Date)
                   .ToListAsync(); // this command actually executes the query
+        }
 
+        public async Task< List<IGrouping<Department,SalesRecord> > > FindByDateGroupAsync(DateTime? initial, DateTime? final)
+        {
+            var result = from sale in _bdContext.SalesRecord select sale; 
+            if (initial.HasValue) 
+            {                                        
+                result.Where(sale => sale.Date >= initial);
+            }
+            if (final.HasValue)
+            {
+                result.Where(sale => sale.Date <= final);
+            }
             
-            //var sales = _bdContext.SalesRecord.Where(sr => sr.Date >= initial && sr.Date <= final);
-            //return sales.ToList();
+            return await result.Include(sale => sale.Seller)
+                 .Include(sale => sale.Seller.Department)
+                 .OrderByDescending(sale => sale.Date)
+                 .GroupBy(sale => sale.Seller.Department)
+                 .ToListAsync(); 
         }
     }
 }
