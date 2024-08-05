@@ -57,14 +57,3 @@ namespace VendasWebMVC.Services
         }
     }
 }
-
-            //result = DateQueryExtension.BiggerOrEqual(result, initial.Value);
-            //result = DateQueryExtension.SmallerOrEqual(result, final.Value);
-            //if (initial.HasValue) 
-            //{                                        
-            //    result = result.Where(sale => sale.Date >= initial);
-            //}
-            //if (final.HasValue)
-            //{
-            //    result = result.Where(sale => sale.Date <= final);
-            //}
